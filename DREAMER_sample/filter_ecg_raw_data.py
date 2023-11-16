@@ -57,11 +57,11 @@ for p in participants:
         
         if baseline_idx is not None and i == baseline_idx:
             if save_baseline:
-                copyfile(os.path.join(raw_data_path, fn), os.path.join(out_data_path, '0.csv'))
-                print("{}  -->  {}", os.path.join(raw_data_path, fn), os.path.join(out_data_path, '0.csv'))
+                copyfile(os.path.join(raw_data_path, fn), os.path.join(out_data_path, 'sess0.csv'))
+                print("{}  -->  {}".format(os.path.join(raw_data_path, fn), os.path.join(out_data_path, 'sess0.csv')))
         if i not in invalid_idx_list:
             if i >= start_idx:
-                copyfile(os.path.join(raw_data_path, fn), os.path.join(out_data_path, '{}.csv'.format(cnt)))
-                print("{}  -->  {}", os.path.join(raw_data_path, fn), os.path.join(out_data_path, '{}.csv'.format(cnt)))
+                copyfile(os.path.join(raw_data_path, fn), os.path.join(out_data_path, 'sess{}.csv'.format(cnt)))
+                print("{}  -->  {}".format(os.path.join(raw_data_path, fn), os.path.join(out_data_path, 'sess{}.csv'.format(cnt))))
                 cnt += 1
     print("=======================")

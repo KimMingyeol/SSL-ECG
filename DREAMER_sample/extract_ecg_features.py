@@ -4,16 +4,18 @@ import numpy as np
 from tqdm import tqdm
 
 ## specify the batch size
-batch_size = 128
+batch_size = 32
 
 ## specify the path where model is saved
 model_path = os.path.abspath("../load_model/saved_model") 
 
-input_dir = 'output'
+input_dir = 'output_ecg_20231115'
 participant_list = [i for i in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, i))]
 
+output_root = 'output_feature_20231115'
+
 for participant in participant_list:
-    output_dir = os.path.join('output_feature', participant)
+    output_dir = os.path.join(output_root, participant)
     os.makedirs(output_dir, exist_ok=True)
     
     fn_list = [i for i in os.listdir(os.path.join(input_dir, participant)) if i.split('.')[-1] == 'npy']

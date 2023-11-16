@@ -28,7 +28,8 @@ def make_window(signal, fs, overlap, window_size_sec):
         start       = start + window_size - overlap
     return segmented[1:]
 
-data_dir = 'data'
+data_dir = 'data_20231115_filtered'
+output_root = 'output_ecg_20231115'
 
 fs = 256 ### no downsampling required for DREAMER format
 order = 10 # order's not described in the paper
@@ -45,7 +46,7 @@ for participant in participant_list:
     print('Processing', participant)
     
     fn_list = [i for i in os.listdir(os.path.join(data_dir, participant)) if i.split('.')[-1] == 'csv']
-    output_dir = os.path.join('output', participant)
+    output_dir = os.path.join(output_root, participant)
     os.makedirs(output_dir, exist_ok=True)
     
     filtered_ecg_dict = {}
@@ -56,8 +57,8 @@ for participant in participant_list:
         
         data = pd.read_csv(data_path, header = 1, skiprows=[2], sep='\t')
         
-        ecg = data.loc[:, 'Shimmer_ecg_ECG_LA-RA_24BIT_CAL'] # unit: mV
-        timestamp = data.loc[:, 'Shimmer_ecg_Timestamp_Unix_CAL'] # unit: ms
+        ecg = data.loc[:, 'Shimmer_ecg_ECG_LL-RA_24BIT_CAL'] # unit: mV
+        timestamp = data.loc[:, 'Shimmer_ecg_TimestampSync_Unix_CAL'] # unit: ms
         
         ecg = ecg.to_numpy()
         timestamp = timestamp.to_numpy()
