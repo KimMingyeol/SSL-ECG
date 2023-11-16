@@ -28,10 +28,36 @@ filter_config = {
         'start': 2,
         'invalid': [],
     },
+    'th': {
+        'baseline': 1,
+        'start': 2,
+        'invalid': [],
+    },
+    'jh': {
+        'baseline': 1,
+        'start': 2,
+        'invalid': [],
+    },
+    'dy': {
+        'baseline': 1,
+        'start': 3,
+        'invalid': [2],
+    },
+    'sj': {
+        'baseline': 1,
+        'start': 3,
+        'invalid': [2],
+    },
+    'sw': {
+        'baseline': 1,
+        'start': 3,
+        'invalid': [2],
+    },
 }
 
-raw_data_root = "data_20231115"
-out_data_root = "data_20231115_filtered"
+date = '20231116'
+raw_data_root = os.path.join('data', 'raw_ecg', date)
+out_data_root = os.path.join('data', 'raw_filtered_ecg', date)
 participants = filter_config.keys()
 
 # Denote baseline index as 0

@@ -10,7 +10,12 @@ name_map = {
     '윤승우': 'su',
     '이규식': 'ks',
     '이윤동': 'yd',
-    '장재웅': 'jw'
+    '장재웅': 'jw',
+    '제태호': 'th',
+    '김지하': 'jh',
+    '최다연': 'dy',
+    '조성재': 'sj',
+    '양승원': 'sw'
 }
 
 score_map = {
@@ -30,48 +35,58 @@ def score(question_num, answer):
     score = score_map[answer]
     return 5 - score if question_num in positive_question_num else score
 
-labels_path = 'labels/stress_survey.csv'
-labels = pd.read_csv(labels_path, header=0, sep=',')
+date = '20231116'
+labels_dir = os.path.join('data', 'survey', date)
+output_root = os.path.join('data', 'label', date)
 
-output_root = 'labels_20231115'
+labels = pd.read_csv(os.path.join(labels_dir, 'survey.csv'), header=0, sep=',')
 
 session_num = 6
-participants_session_stress_score = {}
+participants_session_score = {}
 
 for p_name in name_map.keys():
-    print('---participant:', p_name)
+    print('---participant:', p_name.encode('utf-8'))
     
     p_labels_np = labels.loc[labels['성함을 적어주세요.'] == p_name, :].to_numpy()
     p_labels_np = p_labels_np[:, 2:] # ignore timestamp(0), name(1) column
     p_labels_np = p_labels_np.reshape(session_num, -1)
     
-    p_session_stress_score = []
+    p_session_score = []
     
     for session in range(session_num): # NOTE: Session num start by 1
         print("------session_num:", session+1)
         p_session = p_labels_np[session]
         p_stress_10 = p_session[0]
-        p_stress_score = np.sum([score(question_num+1, answer) for question_num, answer in enumerate(p_session[1:])])
+        p_anxiety_score = np.sum([score(question_num+1, answer) for question_num, answer in enumerate(p_session[1:])])
         
-        p_session_stress_score.append({'session': session+1, 'stress_10': p_stress_10, 'stress_score': p_stress_score})
+        p_session_score.append({'session': session+1, 'stress_score': p_stress_10, 'anxiety_score': p_anxiety_score})
     
-    participants_session_stress_score[name_map[p_name]] = p_session_stress_score
+    participants_session_score[name_map[p_name]] = p_session_score
 
-print(participants_session_stress_score)
-stress_thr = 50
+print(participants_session_score)
+stress_thr = 5
+anxiety_thr = 50
 
 # Classify Stress & Non-Stress
-# Generate DataFrame
+# Generate a DataFrame
 
-dataframe_dict = {'name': []}
+dataframe_stress_dict = {'name': []}
+dataframe_anxiety_dict = {'name': []}
 for session in range(session_num):
-    dataframe_dict['sess{}'.format(session+1)] = []
+    dataframe_stress_dict['sess{}'.format(session+1)] = []
+    dataframe_anxiety_dict['sess{}'.format(session+1)] = []
 
-for p, sessions in participants_session_stress_score.items():
-    dataframe_dict['name'].append(p)
+for p, sessions in participants_session_score.items():
+    dataframe_stress_dict['name'].append(p)
+    dataframe_anxiety_dict['name'].append(p)
     for sess in sessions:
-        dataframe_dict['sess{}'.format(sess['session'])].append('Stress' if sess['stress_score'] > stress_thr else 'Non-Stress')
+        dataframe_stress_dict['sess{}'.format(sess['session'])].append(1 if sess['stress_score'] > stress_thr else 0)
+        dataframe_anxiety_dict['sess{}'.format(sess['session'])].append(1 if sess['anxiety_score'] > anxiety_thr else 0)
 
 os.makedirs(output_root, exist_ok=True)
-df = pd.DataFrame(dataframe_dict)
-df.to_csv(os.path.join(output_root, 'stress_labels.csv'), index=False)
+
+df_stress = pd.DataFrame(dataframe_stress_dict)
+df_stress.to_csv(os.path.join(output_root, 'stress_labels.csv'), index=False)
+
+df_anxiety = pd.DataFrame(dataframe_anxiety_dict)
+df_anxiety.to_csv(os.path.join(output_root, 'anxiety_labels.csv'), index=False)

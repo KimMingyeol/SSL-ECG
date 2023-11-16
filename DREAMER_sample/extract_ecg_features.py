@@ -4,15 +4,16 @@ import numpy as np
 from tqdm import tqdm
 
 ## specify the batch size
-batch_size = 32
+batch_size = 8
 
 ## specify the path where model is saved
 model_path = os.path.abspath("../load_model/saved_model") 
 
-input_dir = 'output_ecg_20231115'
-participant_list = [i for i in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, i))]
+date = '20231116'
+input_dir = os.path.join('data', 'ecg', date)
+output_root = os.path.join('data', 'ecg_feature', date)
 
-output_root = 'output_feature_20231115'
+participant_list = [i for i in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, i))]
 
 for participant in participant_list:
     output_dir = os.path.join(output_root, participant)

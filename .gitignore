@@ -1,2 +1,4 @@
 *.csv
-DREAMER_sample/output*
+*.npy
+*.txt
+*.zip

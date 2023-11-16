@@ -28,8 +28,9 @@ def make_window(signal, fs, overlap, window_size_sec):
         start       = start + window_size - overlap
     return segmented[1:]
 
-data_dir = 'data_20231115_filtered'
-output_root = 'output_ecg_20231115'
+date = '20231116'
+data_dir = os.path.join('data', 'raw_filtered_ecg', date)
+output_root = os.path.join('data', 'ecg', date)
 
 fs = 256 ### no downsampling required for DREAMER format
 order = 10 # order's not described in the paper
@@ -79,11 +80,10 @@ for participant in participant_list:
     std = np.std(filtered_ecg_merged_sorted[np.int(0.025*row_num) : np.int(0.975*row_num)])
     mean = np.mean(filtered_ecg_merged_sorted)
     
-    normalized_ecg = normalize(v['filtered_ecg'], mean, std)
-    crop_time_window = 10 # (sec)
+    crop_time_window = 60 # (sec)
     tw_alpha = 1 # (sec)
     crop_size = (crop_time_window + tw_alpha) * fs
-    filtered_normalized_ecg_dict = {k: {'ecg': normalized_ecg[-crop_size:], 'timestamp': v['timestamp']} for (k, v) in filtered_ecg_dict.items()}
+    filtered_normalized_ecg_dict = {k: {'ecg': normalize(v['filtered_ecg'], mean, std)[-crop_size:], 'timestamp': v['timestamp']} for (k, v) in filtered_ecg_dict.items()}
     ###
     
     ### STEP3: segment into 10 seconds time window
