@@ -68,7 +68,7 @@ for participant in participant_list:
         filtered_ecg_dict[output_fn] = {'filtered_ecg': filtered_ecg.reshape(len(filtered_ecg), 1), 'timestamp': timestamp.reshape(len(timestamp), 1)}
         ###
     
-    ### STEP2: user-specific z-score normalization
+    ### STEP2: user-specific z-score normalization & Crop last (60 + alpha) seconds
     filtered_ecg_list = [v['filtered_ecg'] for v in filtered_ecg_dict.values()]
     print('len(filtered_ecg_list)=', len(filtered_ecg_list), ', containing', filtered_ecg_list[0].shape)
     filtered_ecg_merged = np.vstack(filtered_ecg_list)
@@ -79,7 +79,11 @@ for participant in participant_list:
     std = np.std(filtered_ecg_merged_sorted[np.int(0.025*row_num) : np.int(0.975*row_num)])
     mean = np.mean(filtered_ecg_merged_sorted)
     
-    filtered_normalized_ecg_dict = {k: {'ecg': normalize(v['filtered_ecg'], mean, std), 'timestamp': v['timestamp']} for (k, v) in filtered_ecg_dict.items()}
+    normalized_ecg = normalize(v['filtered_ecg'], mean, std)
+    crop_time_window = 10 # (sec)
+    tw_alpha = 1 # (sec)
+    crop_size = (crop_time_window + tw_alpha) * fs
+    filtered_normalized_ecg_dict = {k: {'ecg': normalized_ecg[-crop_size:], 'timestamp': v['timestamp']} for (k, v) in filtered_ecg_dict.items()}
     ###
     
     ### STEP3: segment into 10 seconds time window
